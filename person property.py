@@ -1,5 +1,9 @@
+import os
+import json
 people = []
-
+if os.path.exists("people.json"):
+    with open("people.json", "r") as f:
+        people = json.load(f)
 properties = [
     ('name', str),
     ('family name', str),
@@ -21,16 +25,9 @@ Available Commands:
   k  : show all people
   e  : exit program
 """)
-
-def add_person():
+def add_person(name):
     person = {}
-    while True:
-        name = input("enter name: ")
-        if name_exists(name):
-            print("Error: this name already exists!")
-        else:
-            person['name'] = name
-            break
+    person['name'] = name 
     for prop, p_type in properties[1:]:
         while True:
             try:
@@ -41,7 +38,9 @@ def add_person():
                 print("Invalid value, try again.")
 
     people.append(person)
-    print("Person added successfully!\n")
+    print("Person added successfully!")
+    print("you %s person aded\n" %len(people))
+    return person
 
 def search_person():
     text = input("enter name or family name to search: ").strip().lower()
@@ -77,16 +76,51 @@ while True:
         show_help()
 
     elif cmd == 'd':
-        add_person()
+        while True:
+            print("type  quit to quit adding")
+            name = input("enter name: ").strip()
+
+            if name == "quit":
+                break
+            person = add_person(name)
+        
 
     elif cmd == 's':
         search_person()
 
     elif cmd == 'k':
-        print_all()
+        while True:
+            print_all()
+            subcmd=input("type d for delete or q for quit:\n")
+            if subcmd == 'd':
+                try:
+                    num = int(input("Enter the number of the person to delete: "))
+                    if num < 1 or num > len(people):
+                        print("Invalid number!")
+                        continue
+                except ValueError:
+                    print("Please enter a valid number!")
+                    continue
+
+                selected = people[num - 1]
+                print(f"Do you want to delete '{selected['name']}'? (yes/no)")
+                confirm = input("> ").strip().lower()
+
+                if confirm == "yes":
+                    del people[num - 1]
+                    print("Person deleted.")
+
+                else:
+                    print("Canceled.")
+            elif subcmd == 'q':
+                break
+
+        
 
     elif cmd == 'e':
         print("Exiting program...")
+        with open("people.json", "w") as f:
+            json.dump(people, f)
         break
 
     else:
