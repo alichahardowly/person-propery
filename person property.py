@@ -1,15 +1,24 @@
 import os
 import json
 people = []
-if os.path.exists("people.json"):
-    with open("people.json", "r") as f:
-        people = json.load(f)
+files = [f for f in os.listdir() if f.endswith(".json")]
+if files:
+    print("Available JSON files:")
+    for i, file in enumerate(files, 1):
+        print(f"{i}. {file}")
+else:
+    print("No JSON files found.")
 properties = [
     ('name', str),
     ('family name', str),
     ('age', int)
 ]
+choice = input("Enter number or name of the file to load, or type a new filename: ").strip()
+if choice.isdigit():
+    choice = files[int(choice)-1]  # تبدیل شماره به نام فایل
 
+with open(choice, "r") as f:
+    people = json.load(f)
 def name_exists(name):
     for person in people:
         if person['name'].lower() == name.lower():
@@ -67,7 +76,8 @@ def print_all():
         for key, value in person.items():
             print(f"  {key}: {value}")
 
-print("Welcome! Type 'h' for help.\n")
+print("Welcome! Type 'h' for help.")
+print(f"you choice {choice} file\n")
 
 while True:
     cmd = input("> ").strip().lower()
@@ -118,10 +128,13 @@ while True:
         
 
     elif cmd == 'e':
-        print("Exiting program...")
-        with open("people.json", "w") as f:
-            json.dump(people, f)
+        subcmd=input('Do yoe want save? (yes/no)')
+        if subcmd == 'yes':
+            subsubcmd=input('please ttype file name:\n')
+            with open("%s.json"%subsubcmd, "w") as f:
+                json.dump(people, f)
         break
 
     else:
         print("Unknown command. Type 'h' for help.")
+        
